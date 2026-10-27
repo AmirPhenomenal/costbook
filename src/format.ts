@@ -4,10 +4,16 @@ export interface MoneyFormat {
   locale: string;
 }
 
+/** Currencies with no cents in daily use: amounts of 1 or more are shown as whole numbers. */
+const NO_CENTS = new Set(['تومان', 'ریال', 'toman', 'rial', 'irr', 'irt', '¥', 'jpy', '₩', 'krw']);
+
 export function money(v: number, f: MoneyFormat): string {
   const abs = Math.abs(v);
-  const max = abs === 0 ? 0 : abs < 0.01 ? 4 : abs < 1 ? 3 : abs >= 1000 ? 0 : 2;
-  const min = abs >= 1000 || abs === 0 ? 0 : 2;
+  const noCents = NO_CENTS.has(f.currency.trim().toLowerCase());
+  const max = abs === 0 ? 0 : abs < 0.01 ? 4 : abs < 1 ? 3 : abs >= 1000 || noCents ? 0 : 2;
+  // Cents are shown as "1.50", but a whole amount stays whole: "$12", "200 تومان" (not "200.00").
+  const whole = Math.abs(abs - Math.round(abs)) < 0.005;
+  const min = whole || max === 0 ? 0 : 2;
   const n = v.toLocaleString(f.locale, { minimumFractionDigits: Math.min(min, max), maximumFractionDigits: max });
   return f.currencyAfter ? `${n} ${f.currency}` : `${f.currency}${n}`;
 }

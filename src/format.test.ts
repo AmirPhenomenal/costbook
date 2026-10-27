@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { groupTyped, inputNumber, parseNumber } from './format';
+import { groupTyped, inputNumber, money, parseNumber } from './format';
 
 describe('thousands separators in number boxes', () => {
   it('groups while typing, keeping what was typed', () => {
@@ -22,5 +22,20 @@ describe('thousands separators in number boxes', () => {
       expect(parseNumber(inputNumber(v, 'en-US'))).toBe(v);
       expect(parseNumber(inputNumber(v, 'fa-IR'))).toBe(v);
     }
+  });
+});
+
+describe('money', () => {
+  const toman = { currency: 'تومان', currencyAfter: true, locale: 'fa-IR' };
+  const usd = { currency: '$', currencyAfter: false, locale: 'en-US' };
+  it('shows whole toman amounts without decimals', () => {
+    expect(money(200, toman)).toBe('۲۰۰ تومان');
+    expect(money(182.3, toman)).toBe('۱۸۲ تومان');
+    expect(money(200_000, toman)).toBe('۲۰۰٬۰۰۰ تومان');
+  });
+  it('keeps cents for dollars, but not ".00" on whole amounts', () => {
+    expect(money(1.5, usd)).toBe('$1.50');
+    expect(money(12, usd)).toBe('$12');
+    expect(money(0.659, usd)).toBe('$0.659');
   });
 });
