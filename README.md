@@ -26,6 +26,8 @@ to ChatGPT / Claude / Gemini to check this repository for you.
 - **Profit & margin:** type your selling price and see what you earn on each one.
 - **“What should I charge?”** suggestions: food cost at 25 / 30 / 35 % of price, or 2× / 3× cost.
 - **Full breakdown:** where every cent goes, down to the last gram of salt.
+- **Map of everything:** an interactive map of what goes into what. Tap a material to see every
+  product it ends up in (and how many get pricier if it does), or a product to see where its cost goes.
 - **Quick calculator:** “what do 50 pizzas cost me?”
 - **English and Farsi** (right-to-left, Persian digits, toman/rial, سیر and مثقال).
 - **Install it like an app** (phone or computer). It opens even without internet.
@@ -62,6 +64,7 @@ React + TypeScript + Vite. Runtime dependencies: `react`, `react-dom` and
 | File | What it does |
 |---|---|
 | `src/cost.ts` | All cost math (unit conversion, nested recipes, loop detection) |
+| `src/graph.ts` | The map: who uses what, cost shares, and the layout |
 | `src/storage.ts` | Saving to `localStorage`, backup files, validation of imported files |
 | `src/i18n.tsx` | English and Farsi text |
 | `src/units.ts` | Units and conversions |
@@ -92,6 +95,7 @@ License: MIT. The Vazirmatn font is under the SIL Open Font License (see `public
 - **سود و حاشیهٔ سود:** قیمت فروش را بنویسید و ببینید از هر کدام چقدر درمی‌آورید.
 - **«به چه قیمتی بفروشم؟»:** پیشنهاد قیمت بر اساس سهم ۲۵، ۳۰ یا ۳۵ درصدی هزینه، یا ۲ و ۳ برابر هزینه.
 - **ریز هزینه:** پول کجا خرج می‌شود، تا آخرین گرم نمک.
+- **نقشهٔ همه‌چیز:** نقشه‌ای تعاملی از اینکه چه چیزی در چه چیزی به کار رفته. روی یک مادهٔ اولیه بزنید تا ببینید به کدام محصولات می‌رسد و اگر گران شود هزینهٔ چند محصول بالا می‌رود، یا روی یک محصول تا ببینید هزینه‌اش کجا می‌رود.
 - **فارسی و انگلیسی** با چینش راست‌به‌چپ، اعداد فارسی، تومان و ریال، سیر و مثقال.
 - **نصب مثل یک برنامه** روی گوشی یا کامپیوتر، که بدون اینترنت هم باز می‌شود.
 - حالت روشن و تیره، مناسب گوشی، قابل چاپ.

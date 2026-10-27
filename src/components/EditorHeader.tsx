@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { usedIn } from '../cost';
 import { useI18n } from '../i18n';
-import { useApp } from '../state';
+import { MAP, useApp } from '../state';
+import { MapIcon } from './MapView';
 import type { Item } from '../types';
 import { newId } from '../types';
 import { useConfirm } from './Confirm';
@@ -63,6 +64,10 @@ export function EditorHeader({ item, onChange, onSelect, returnTo }: Props) {
         )}
         <span className={`badge ${item.kind}`}>{t(item.kind === 'recipe' ? 'kind.recipe' : 'kind.ingredient')}</span>
         <span className="grow" />
+        <button className="btn ghost" onClick={() => onSelect(MAP + item.id)} title={t('map.show')}>
+          <MapIcon />
+          <span className="hide-phone">{t('map.title')}</span>
+        </button>
         {item.kind === 'recipe' && (
           <button className="btn ghost hide-phone" onClick={() => window.print()}>
             {t('print')}

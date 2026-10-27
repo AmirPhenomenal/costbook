@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
 import { useI18n } from '../i18n';
 import { useInstall } from '../pwa';
-import { useApp } from '../state';
+import { isMap, MAP, useApp } from '../state';
+import { MapIcon } from './MapView';
 import type { Item } from '../types';
 
 interface Props {
@@ -91,6 +92,16 @@ export function Sidebar({ selectedId, onSelect, onOpenData }: Props) {
           </span>
         </button>
       </div>
+
+      {all.length > 1 && (
+        <button className={`map-btn ${isMap(selectedId) ? 'on' : ''}`} onClick={() => onSelect(MAP)}>
+          <MapIcon />
+          <span className="new-text">
+            <b>{t('map.open')}</b>
+            <span>{t('map.sub')}</span>
+          </span>
+        </button>
+      )}
 
       {all.length > 0 && (
         <div className="list-tools">

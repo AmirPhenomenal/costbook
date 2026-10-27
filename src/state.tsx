@@ -138,8 +138,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
 // ---- tiny hash router: #/item/<id> makes the phone "back" button work ----
 
+/** Selection value that opens the map: MAP, or MAP + an item id to start focused on it. */
+export const MAP = 'map:';
+export const isMap = (sel: string | null): sel is string => sel?.startsWith(MAP) ?? false;
+
 export function useSelection(): [string | null, (id: string | null) => void] {
   const read = () => {
+    const map = /^#\/map(?:\/(.+))?$/.exec(location.hash);
+    if (map) return MAP + (map[1] ? decodeURIComponent(map[1]) : '');
     const m = /^#\/item\/(.+)$/.exec(location.hash);
     return m ? decodeURIComponent(m[1]) : null;
   };
@@ -150,7 +156,8 @@ export function useSelection(): [string | null, (id: string | null) => void] {
     return () => window.removeEventListener('hashchange', on);
   }, []);
   const select = useCallback((next: string | null) => {
-    if (next) location.hash = `#/item/${encodeURIComponent(next)}`;
+    if (isMap(next)) location.hash = next === MAP ? '#/map' : `#/map/${encodeURIComponent(next.slice(MAP.length))}`;
+    else if (next) location.hash = `#/item/${encodeURIComponent(next)}`;
     else if (location.hash) history.pushState(null, '', location.pathname + location.search);
     setId(next);
   }, []);
