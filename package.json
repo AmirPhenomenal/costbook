@@ -1,0 +1,26 @@
+{
+  "name": "costbook",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Private, offline-first cost calculator for recipes and products. All data stays in your browser.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build && node scripts/check-no-network.mjs dist",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "check:network": "node scripts/check-no-network.mjs src dist"
+  },
+  "dependencies": {
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "typescript": "7.0.2",
+    "vite": "8.3.5",
+    "vitest": "5.0.5"
+  }
+}
