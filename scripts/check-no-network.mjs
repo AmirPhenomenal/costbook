@@ -10,6 +10,11 @@
  *    plain text inside the React library and are never requested.
  * 3. dist/index.html must contain the Content-Security-Policy that makes the
  *    browser itself block all network connections (connect-src 'none').
+ * 4. One exception: the offline helper (pwa/sw.js → dist/sw.js) that lets the
+ *    installed app open without internet. It may load files, but only from
+ *    this same site, it must not contain any link to another site, and it
+ *    must not touch stored data or accept messages from the page. The page may
+ *    only register that one file.
  *
  * Runs in CI on every push, see .github/workflows/deploy.yml.
  */
@@ -36,6 +41,17 @@ const ALLOWED_URL = [
   /^https:\/\/react\.dev\/errors\//, // text in React error messages
 ];
 
+// The page may start the offline helper, nothing else.
+const ALLOWED_SNIPPETS = [
+  /navigator\.serviceWorker\.register\(\s*["'`]\.\/sw\.js["'`]/g,
+  /["'`]serviceWorker["'`]\s*in\s*navigator/g,
+];
+const REGISTER_ALLOWED_IN = ['src/pwa.ts'];
+
+// Rules for the offline helper itself.
+const SW_REQUIRED = [/url\.origin !== self\.location\.origin/];
+const SW_FORBIDDEN = [/localStorage/, /indexedDB/, /addEventListener\(\s*["']message["']/, /\bonmessage\b/, /postMessage/, /importScripts/];
+
 const TEXT_EXT = new Set(['.js', '.mjs', '.ts', '.tsx', '.jsx', '.html', '.css', '.json', '.svg']);
 
 function walk(dir) {
@@ -59,7 +75,17 @@ for (const dir of dirs) {
   }
   const isSource = dir.replace(/\\/g, '/').replace(/\/$/, '').endsWith('src');
   for (const file of walk(dir)) {
-    const text = readFileSync(file, 'utf8');
+    const raw = readFileSync(file, 'utf8');
+    const rel = file.split('\\').join('/');
+    const isHelper = /(^|\/)sw\.js$/.test(rel);
+    let text = raw;
+    if (isHelper) {
+      for (const re of SW_REQUIRED) if (!re.test(raw)) problems.push(`${file}: offline helper must ignore requests to other sites`);
+      for (const re of SW_FORBIDDEN) if (re.test(raw)) problems.push(`${file}: offline helper must not use "${re.source}"`);
+      text = raw.replace(/\bfetch\s*\(/g, '');
+    } else if (!isSource || REGISTER_ALLOWED_IN.some((f) => rel.endsWith(f))) {
+      for (const re of ALLOWED_SNIPPETS) text = text.replace(re, '');
+    }
     for (const re of NETWORK_APIS) {
       const m = re.exec(text);
       if (m) problems.push(`${file}: uses network API "${m[0]}"`);

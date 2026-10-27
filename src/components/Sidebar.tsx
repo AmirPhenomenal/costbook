@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useI18n } from '../i18n';
+import { useInstall } from '../pwa';
 import { useApp } from '../state';
 import type { Item } from '../types';
 
@@ -18,6 +19,7 @@ export function Sidebar({ selectedId, onSelect, onOpenData }: Props) {
   const { t, lang, setLang, locale } = useI18n();
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
+  const { state: installState, install } = useInstall();
 
   const all = Object.values(data.items);
   const groups = useMemo(() => {
@@ -116,6 +118,22 @@ export function Sidebar({ selectedId, onSelect, onOpenData }: Props) {
           </section>
         ))}
       </nav>
+
+      {installState === 'available' && (
+        <button className="install-cta" onClick={() => void install()}>
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden>
+            <path
+              d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <span className="grow">{t('install.button')}</span>
+        </button>
+      )}
 
       <button className={`privacy ${saveFailed || needsBackup ? 'attention' : ''}`} onClick={onOpenData}>
         {saveFailed ? (

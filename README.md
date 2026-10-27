@@ -26,13 +26,16 @@ to ChatGPT / Claude / Gemini to check this repository for you.
 - **Full breakdown:** where every cent goes, down to the last gram of salt.
 - **Quick calculator:** “what do 50 pizzas cost me?”
 - **English and Farsi** (right-to-left, Persian digits, toman/rial, سیر and مثقال).
+- **Install it like an app** (phone or computer). It opens even without internet.
 - Light & dark mode, works on phones, printable cost sheets.
 - **Backup & restore** to a file, so you can move to another device.
 
 ## Use it
 
-Open the website link of this repository (GitHub Pages). Nothing to install.
-On a phone you can use “Add to Home Screen” to open it like an app.
+Open the website: **https://amirphenomenal.github.io/costbook/**. No sign-up needed.
+
+To install it as an app: press **Install app** (Chrome, Edge, Android), or on iPhone/iPad
+use Share → **Add to Home Screen**. The installed app works offline.
 
 ## Run it yourself
 
@@ -51,7 +54,8 @@ npm run build      # type check + build + privacy check → dist/
 
 ## How it is built
 
-React + TypeScript + Vite. Only two runtime dependencies (`react`, `react-dom`).
+React + TypeScript + Vite. Runtime dependencies: `react`, `react-dom` and
+`@headlessui/react` (accessible modals, no network code).
 
 | File | What it does |
 |---|---|
@@ -60,6 +64,7 @@ React + TypeScript + Vite. Only two runtime dependencies (`react`, `react-dom`).
 | `src/i18n.tsx` | English and Farsi text |
 | `src/units.ts` | Units and conversions |
 | `vite.config.ts` | Adds the Content-Security-Policy that blocks all network access |
+| `pwa/sw.js` | Offline helper for the installed app (only stores the app's own files) |
 | `scripts/check-no-network.mjs` | Fails the build if any network code appears |
 
 License: MIT. The Vazirmatn font is under the SIL Open Font License (see `public/fonts`).
@@ -85,12 +90,15 @@ License: MIT. The Vazirmatn font is under the SIL Open Font License (see `public
 - **«به چه قیمتی بفروشم؟»:** پیشنهاد قیمت بر اساس سهم ۲۵، ۳۰ یا ۳۵ درصدی هزینه، یا ۲ و ۳ برابر هزینه.
 - **ریز هزینه:** پول کجا خرج می‌شود، تا آخرین گرم نمک.
 - **فارسی و انگلیسی** با چینش راست‌به‌چپ، اعداد فارسی، تومان و ریال، سیر و مثقال.
+- **نصب مثل یک برنامه** روی گوشی یا کامپیوتر، که بدون اینترنت هم باز می‌شود.
 - حالت روشن و تیره، مناسب گوشی، قابل چاپ.
 - **پشتیبان‌گیری و بازگردانی** با فایل، برای انتقال به دستگاه دیگر.
 
 ### استفاده
 
-لینک وب‌سایت این مخزن (GitHub Pages) را باز کنید. نصب لازم نیست. در گوشی با گزینهٔ «افزودن به صفحهٔ اصلی» مثل یک اپ بازش کنید.
+وب‌سایت را باز کنید: **https://amirphenomenal.github.io/costbook/** بدون ثبت‌نام.
+
+برای نصب به‌عنوان برنامه، دکمهٔ **نصب برنامه** را بزنید (Chrome، Edge، اندروید). در آیفون و آیپد از دکمهٔ اشتراک‌گذاری، «افزودن به صفحهٔ اصلی» را انتخاب کنید. برنامهٔ نصب‌شده بدون اینترنت هم کار می‌کند.
 
 **یادتان باشد:** پاک کردن اطلاعات مرورگر، اقلام شما را هم پاک می‌کند. هر چند وقت یک بار از بخش تنظیمات فایل پشتیبان بگیرید.
 

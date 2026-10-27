@@ -12,6 +12,7 @@ The app cannot send them anywhere, and anyone can check this.
 | Language choice | Your browser's `localStorage`. |
 | Backup file | Created **in your browser** and saved to your device when you press “Download backup”. Nothing is uploaded. |
 | Restoring a backup | The file is read **in your browser**. Nothing is uploaded. |
+| Offline copy of the app (when installed) | The browser keeps a copy of **Costbook's own files** (page, script, fonts, icons) so it opens without internet. Your items are not part of it. |
 
 ## How the “no sending” promise is enforced
 
@@ -24,9 +25,17 @@ The app cannot send them anywhere, and anyone can check this.
    built website for network APIs (`fetch`, `XMLHttpRequest`, `WebSocket`, `sendBeacon`…)
    and for links to other websites. GitHub runs it on every change
    (`.github/workflows/deploy.yml`); if it finds anything, the site is **not** published.
-3. **Tiny dependency list.** The app ships only React and React-DOM
-   (see `package.json`). Fonts are stored in this repo (`public/fonts`), not loaded from Google.
-4. **Built in public.** The live site is built by GitHub Actions directly from the code
+3. **Tiny dependency list.** The app ships only React, React-DOM and Headless UI
+   (accessible pop-up windows, made by the Tailwind team), see `package.json`.
+   The privacy check scans their built code too. Fonts are stored in this repo (`public/fonts`), not loaded from Google.
+4. **The offline helper is limited and checked.** Installing the app uses a small
+   service worker, `pwa/sw.js` (about 90 lines, readable). It only stores and serves
+   this site's own files and ignores every request to any other website. It cannot
+   read your items (service workers have no access to the browser storage the app
+   uses), and the app never sends it messages. The privacy check fails the build if
+   it ever contains a link to another site, reads stored data, or accepts messages.
+   The page's policy allows only this one file as a worker (`worker-src 'self'`).
+5. **Built in public.** The live site is built by GitHub Actions directly from the code
    in this repository, so what you read here is what runs.
 
 ## Things to know (honest limits)
@@ -54,9 +63,11 @@ Copy this, replace the link, and paste it into ChatGPT, Claude, Gemini or any AI
 > 2. Does the build add a Content-Security-Policy with `connect-src 'none'` and
 >    `default-src 'none'` (see `vite.config.ts` and `index.html`)?
 > 3. Do the dependencies in `package.json` include anything that could phone home?
-> 4. Does the GitHub Actions workflow (`.github/workflows/deploy.yml`) build the site
+> 4. Does the offline helper (`pwa/sw.js`) only cache and serve the site's own files,
+>    without contacting other sites or reading user data?
+> 5. Does the GitHub Actions workflow (`.github/workflows/deploy.yml`) build the site
 >    from this code and run the privacy check (`scripts/check-no-network.mjs`)?
-> 5. Anything else that could leak recipes or prices?
+> 6. Anything else that could leak recipes or prices?
 > Give me a plain-language answer for a non-programmer.
 
 ## Reporting a problem

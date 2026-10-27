@@ -4,6 +4,7 @@ import { useI18n } from '../i18n';
 import { useApp } from '../state';
 import type { Item } from '../types';
 import { newId } from '../types';
+import { useConfirm } from './Confirm';
 
 interface Props {
   item: Item;
@@ -14,6 +15,7 @@ interface Props {
 export function EditorHeader({ item, onChange, onSelect }: Props) {
   const { data, dispatch } = useApp();
   const { t, locale, lang } = useI18n();
+  const confirm = useConfirm();
   const categories = useMemo(
     () => [...new Set(Object.values(data.items).map((i) => i.category.trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, locale)),
     [data.items, locale],
@@ -29,13 +31,18 @@ export function EditorHeader({ item, onChange, onSelect }: Props) {
     onSelect(copy.id);
   };
 
-  const remove = () => {
+  const remove = async () => {
     const users = usedIn(data.items, item.id);
     const name = item.name || t('untitled');
-    const msg = users.length
-      ? t('confirmDeleteUsed', { name, list: users.map((u) => u.name || t('untitled')).join(lang === 'fa' ? '، ' : ', ') })
-      : t('confirmDelete', { name });
-    if (window.confirm(msg)) {
+    const ok = await confirm({
+      title: t('confirmDelete', { name }),
+      body: users.length
+        ? t('confirmDeleteUsed', { list: users.map((u) => u.name || t('untitled')).join(lang === 'fa' ? '، ' : ', ') })
+        : t('confirmDeleteBody'),
+      ok: t('delete'),
+      danger: true,
+    });
+    if (ok) {
       dispatch({ type: 'remove', id: item.id });
       onSelect(null);
     }
