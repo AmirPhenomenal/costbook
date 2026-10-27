@@ -4,9 +4,9 @@
 
 <a id="english"></a>
 
-A simple, private calculator for the **real cost of anything you make**: a pizza, a cake,
-a sauce, a fingerprint scanner, a 3D-printed part. Enter what you pay for your ingredients
-or parts once, build your recipes from them, and see exactly what one unit costs you.
+A simple, private calculator for the **real cost of anything you make**: a dish, a cake,
+a candle, a T-shirt, a piece of furniture, an electronic device. Enter what you pay for your
+**materials** once, list what each **product** uses, and see exactly what one piece costs you.
 Anything you charge above that is profit.
 
 **🔒 Private:** no account, no server, no tracking. Everything stays in your browser on
@@ -15,11 +15,13 @@ to ChatGPT / Claude / Gemini to check this repository for you.
 
 ## What you can do
 
-- **Ingredients & parts:** “I pay 18 for a 25 kg bag of flour” → the app knows the price per gram.
-  Works for weight, volume, pieces, length, area, **electricity (kWh)** and **labor (hours)**.
-- **Recipes inside recipes:** make a *dough* from flour, water, salt and yeast. Then add
-  “250 g of dough” to a *pizza*. The pizza's cost includes everything in the dough automatically.
-  Change the price of flour once and every recipe updates.
+- **Materials:** anything you buy or pay for. “I pay 45 for a 10 kg bag of wax” → the app knows
+  the price per gram. Works for weight, volume, pieces, length, area, **electricity (kWh)** and
+  **your work (hours)**.
+- **Products inside products:** make a *dough* and use 250 g of it in a *pizza*, or print a
+  *case* and use it in a *device*. The full cost comes along automatically.
+  Change the price of a material once and every product updates.
+- **Ready-made examples:** a café (pizza), handmade candles, and an electronics device.
 - **Your cost per piece**, big and clear, plus the cost of a whole batch.
 - **Profit & margin:** type your selling price and see what you earn on each one.
 - **“What should I charge?”** suggestions: food cost at 25 / 30 / 35 % of price, or 2× / 3× cost.
@@ -77,14 +79,15 @@ License: MIT. The Vazirmatn font is under the SIL Open Font License (see `public
 
 ## فارسی
 
-ماشین‌حسابی ساده و خصوصی برای **قیمت تمام‌شدهٔ هر چیزی که می‌سازید**: پیتزا، کیک، سس، دستگاه اسکنر اثر انگشت یا یک قطعهٔ پرینت سه‌بعدی. یک بار قیمت خرید مواد اولیه یا قطعه‌ها را وارد کنید، دستورهایتان را با آن‌ها بسازید و ببینید هر عدد دقیقاً چقدر برایتان تمام می‌شود. هر چه بالاتر از آن بفروشید، سود شماست.
+ماشین‌حسابی ساده و خصوصی برای **قیمت تمام‌شدهٔ هر چیزی که می‌سازید**: غذا، کیک، شمع، لباس، مبل یا یک دستگاه الکترونیکی. یک بار قیمت خرید **مواد اولیه** را وارد کنید، بگویید هر **محصول** چه چیزهایی مصرف می‌کند و ببینید هر عدد دقیقاً چقدر برایتان تمام می‌شود. هر چه بالاتر از آن بفروشید، سود شماست.
 
 **🔒 خصوصی:** بدون حساب کاربری، بدون سرور، بدون ردیابی. همه‌چیز فقط در مرورگر دستگاه خودتان می‌ماند. فایل [SECURITY.md](SECURITY.md) توضیح می‌دهد چطور، و یک متن آماده دارد که می‌توانید به ChatGPT یا Claude یا Gemini بدهید تا این مخزن را برایتان بررسی کنند.
 
 ### امکانات
 
-- **مواد اولیه و قطعه‌ها:** «کیسهٔ ۲۵ کیلویی آرد را ۱٬۸۰۰٬۰۰۰ تومان می‌خرم» و برنامه قیمت هر گرم را می‌داند. وزن، حجم، تعداد، طول، مساحت، **برق (کیلووات‌ساعت)** و **دستمزد (ساعت)** پشتیبانی می‌شود.
-- **دستور داخل دستور:** خمیر را از آرد و آب و نمک و خمیرمایه بسازید، بعد «۲۵۰ گرم خمیر» را به پیتزا اضافه کنید. هزینهٔ همهٔ اجزای خمیر خودکار حساب می‌شود. قیمت آرد را یک بار عوض کنید، همهٔ دستورها به‌روز می‌شوند.
+- **مواد اولیه:** هر چیزی که می‌خرید یا هزینه‌اش را می‌دهید. «کیسهٔ ۲۵ کیلویی آرد را ۱٬۸۰۰٬۰۰۰ تومان می‌خرم» و برنامه قیمت هر گرم را می‌داند. وزن، حجم، تعداد، طول، مساحت، **برق (کیلووات‌ساعت)** و **دستمزد (ساعت)** پشتیبانی می‌شود.
+- **محصول داخل محصول:** خمیر بسازید و ۲۵۰ گرمش را در پیتزا بگذارید، یا بدنه‌ای پرینت کنید و در دستگاه به کار ببرید. کل هزینه‌اش خودکار حساب می‌شود. قیمت یک ماده را یک بار عوض کنید، همهٔ محصولات به‌روز می‌شوند.
+- **نمونه‌های آماده:** کافه (پیتزا)، شمع دست‌ساز و یک دستگاه الکترونیکی.
 - **هزینهٔ هر عدد**، درشت و واضح، به‌همراه هزینهٔ کل یک نوبت تولید.
 - **سود و حاشیهٔ سود:** قیمت فروش را بنویسید و ببینید از هر کدام چقدر درمی‌آورید.
 - **«به چه قیمتی بفروشم؟»:** پیشنهاد قیمت بر اساس سهم ۲۵، ۳۰ یا ۳۵ درصدی هزینه، یا ۲ و ۳ برابر هزینه.

@@ -10,9 +10,11 @@ interface Props {
   item: Item;
   onChange: (item: Item) => void;
   onSelect: (id: string | null) => void;
+  /** The product the user came from, offered as a way back. */
+  returnTo?: Item | null;
 }
 
-export function EditorHeader({ item, onChange, onSelect }: Props) {
+export function EditorHeader({ item, onChange, onSelect, returnTo }: Props) {
   const { data, dispatch } = useApp();
   const { t, locale, lang } = useI18n();
   const confirm = useConfirm();
@@ -50,14 +52,19 @@ export function EditorHeader({ item, onChange, onSelect }: Props) {
 
   return (
     <header className="editor-header">
-      <div className="editor-toolbar">
+      <div className={`editor-toolbar ${returnTo ? 'has-return' : ''}`}>
         <button className="btn ghost back" onClick={() => onSelect(null)}>
           {t('back')}
         </button>
+        {returnTo && (
+          <button className="btn ghost return" onClick={() => onSelect(returnTo.id)}>
+            <span className="ellipsis">{t('backTo', { name: returnTo.name || t('untitled') })}</span>
+          </button>
+        )}
         <span className={`badge ${item.kind}`}>{t(item.kind === 'recipe' ? 'kind.recipe' : 'kind.ingredient')}</span>
         <span className="grow" />
         {item.kind === 'recipe' && (
-          <button className="btn ghost" onClick={() => window.print()}>
+          <button className="btn ghost hide-phone" onClick={() => window.print()}>
             {t('print')}
           </button>
         )}

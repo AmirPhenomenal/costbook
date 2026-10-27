@@ -1,5 +1,14 @@
 import { useMemo, useState } from 'react';
-import { batchCost, breakdown, costPerYieldUnit, itemBaseUnit, lineCost, priceForCostPercent, usedIn, wouldCreateCycle } from '../cost';
+import {
+  batchCost,
+  breakdown,
+  costPerYieldUnit,
+  itemBaseUnit,
+  lineCost,
+  priceForCostPercent,
+  usedIn,
+  wouldCreateCycle,
+} from '../cost';
 import { money, percent, qty } from '../format';
 import { useI18n } from '../i18n';
 import { useApp } from '../state';
@@ -16,6 +25,7 @@ import { UnitSelect } from './UnitSelect';
 interface Props {
   item: Recipe;
   onSelect: (id: string | null) => void;
+  returnTo?: Item | null;
 }
 
 /** Round a suggested price UP to 3 significant digits (12.37 → 12.4, 15,333 → 15,400). */
@@ -25,9 +35,9 @@ function niceRound(v: number): number {
   return Number((Math.ceil(v / step - 1e-9) * step).toPrecision(12));
 }
 
-export function RecipeEditor({ item, onSelect }: Props) {
+export function RecipeEditor({ item, onSelect, returnTo }: Props) {
   const { data, dispatch, fmt, createItem, priceLabel } = useApp();
-  const { t, unit, error, locale } = useI18n();
+  const { t, unit, unitOne, error, locale } = useI18n();
   const [focusLine, setFocusLine] = useState<string | null>(null);
   const [scaleQty, setScaleQty] = useState(10);
   const set = (patch: Partial<Recipe>) => dispatch({ type: 'upsert', item: { ...item, ...patch } });
@@ -36,7 +46,8 @@ export function RecipeEditor({ item, onSelect }: Props) {
 
   const batch = batchCost(data.items, item);
   const perUnit = costPerYieldUnit(data.items, item);
-  const yieldLabel = unit(item.yieldUnit);
+  const yieldLabel = unit(item.yieldUnit); // after an amount: "10 pcs"
+  const yieldOne = unitOne(item.yieldUnit); // after "per": "per piece"
   const hasLines = item.components.length > 0;
 
   const candidates = useMemo(
@@ -72,58 +83,72 @@ export function RecipeEditor({ item, onSelect }: Props) {
         label: t('pricing.costShare', { p: percent(p, locale) }),
         price: niceRound(priceForCostPercent(cost, p) ?? 0),
       })),
-      ...[2, 3].map((x) => ({ key: `x${x}`, label: t('pricing.markup', { x: x.toLocaleString(locale) }), price: niceRound(cost * x) })),
+      ...[2, 3].map((x) => ({
+        key: `x${x}`,
+        label: t('pricing.markup', { x: x.toLocaleString(locale) }),
+        price: niceRound(cost * x),
+      })),
     ];
   }, [cost, data.targetCostPercent, t, locale]);
 
   return (
     <div className="editor">
-      <EditorHeader item={item} onChange={(i) => set(i as Recipe)} onSelect={onSelect} />
+      <EditorHeader item={item} onChange={(i) => set(i as Recipe)} onSelect={onSelect} returnTo={returnTo} />
+
+      {/* ---------- New product: show the way ---------- */}
+      {!hasLines && (
+        <section className="guide">
+          <h2>{t('guide.title')}</h2>
+          <ol>
+            {([1, 2, 3] as const).map((n) => (
+              <li key={n}>
+                <span className="step-num">{n.toLocaleString(locale)}</span>
+                {t(`guide.${n}`)}
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
 
       {/* ---------- The answer: what it costs you, and what you make ---------- */}
-      <section className="hero">
-        <div className="hero-cost">
-          <span className="label">{t('costPer', { unit: yieldLabel })}</span>
-          <span className="value">{cost !== null && hasLines ? money(cost, fmt) : '—'}</span>
-          {!perUnit.ok && hasLines ? (
-            <span className="warn small">{error(perUnit.error)}</span>
-          ) : (
-            hasLines && <span className="small explain">{t('costExplain')}</span>
-          )}
-        </div>
-        <div className="hero-side">
-          <label className="field">
-            <span className="field-label">{t('sellPrice', { unit: yieldLabel })}</span>
-            <MoneyField id="sell" value={sell ?? 0} onChange={(v) => set({ sellPrice: v > 0 ? v : null })} />
-          </label>
-          <div className={`profit ${profit === null ? '' : profit >= 0 ? 'good' : 'bad'}`}>
-            {profit !== null && sell ? (
-              <>
-                <span className="field-label">{t('profitPer', { unit: yieldLabel })}</span>
-                <span className="value">{money(profit, fmt)}</span>
-                <span className="small">
-                  {profit < 0
-                    ? t('loss', { x: money(-profit, fmt) })
-                    : t('margin', { m: percent((profit / sell) * 100, locale), c: percent((cost! / sell) * 100, locale) })}
-                </span>
-              </>
+      {hasLines && (
+        <section className="hero">
+          <div className="hero-cost">
+            <span className="label">{t('costPer', { unit: yieldOne })}</span>
+            <span className="value">{cost !== null && hasLines ? money(cost, fmt) : '—'}</span>
+            {!perUnit.ok && hasLines ? (
+              <span className="warn small">{error(perUnit.error)}</span>
             ) : (
-              <span className="muted small">{t('enterSell')}</span>
+              hasLines && <span className="small explain">{t('costExplain')}</span>
             )}
           </div>
-        </div>
-      </section>
-
-      {/* ---------- Components ---------- */}
-      <section className="card">
-        <div className="card-head">
-          <h2>{t('components')}</h2>
-          <div className="yield">
-            <span className="muted">{t('batchMakes')}</span>
-            <NumberField value={item.yieldQty} onChange={(yieldQty) => set({ yieldQty })} aria-label={t('batchMakes')} className="short" />
-            <UnitSelect value={item.yieldUnit} onChange={(yieldUnit) => set({ yieldUnit })} aria-label={t('batchMakes')} />
+          <div className="hero-side">
+            <label className="field">
+              <span className="field-label">{t('sellPrice', { unit: yieldOne })}</span>
+              <MoneyField id="sell" value={sell ?? 0} onChange={(v) => set({ sellPrice: v > 0 ? v : null })} />
+            </label>
+            <div className={`profit ${profit === null ? '' : profit >= 0 ? 'good' : 'bad'}`}>
+              {profit !== null && sell ? (
+                <>
+                  <span className="field-label">{t('profitPer', { unit: yieldOne })}</span>
+                  <span className="value">{money(profit, fmt)}</span>
+                  <span className="small">
+                    {profit < 0
+                      ? t('loss', { x: money(-profit, fmt) })
+                      : t('margin', { m: percent((profit / sell) * 100, locale), c: percent((cost! / sell) * 100, locale) })}
+                  </span>
+                </>
+              ) : (
+                <span className="muted small">{t('enterSell')}</span>
+              )}
+            </div>
           </div>
-        </div>
+        </section>
+      )}
+
+      {/* ---------- Step 1: what goes into it ---------- */}
+      <section className="card">
+        <h2>{t('components')}</h2>
         <p className="hint">{t('components.hint')}</p>
 
         {hasLines ? (
@@ -169,7 +194,12 @@ export function RecipeEditor({ item, onSelect }: Props) {
                       onChange={(v) => setLine(line.id, { qty: v })}
                       aria-label={`${t('col.amount')}: ${child?.name ?? ''}`}
                     />
-                    <UnitSelect value={line.unit} family={fam} onChange={(u) => setLine(line.id, { unit: u })} aria-label={t('col.amount')} />
+                    <UnitSelect
+                      value={line.unit}
+                      family={fam}
+                      onChange={(u) => setLine(line.id, { unit: u })}
+                      aria-label={t('col.amount')}
+                    />
                   </span>
                   <span className="line-cost end">
                     {c.ok ? (
@@ -199,9 +229,7 @@ export function RecipeEditor({ item, onSelect }: Props) {
             })}
             <div className="line total" role="row">
               <span>{t('total')}</span>
-              <span className="muted small">
-                {t('batch', { qty: qty(item.yieldQty, locale), unit: yieldLabel })}
-              </span>
+              <span className="muted small">{t('batch', { qty: qty(item.yieldQty, locale), unit: yieldLabel })}</span>
               <span className="end money">{batch.ok ? money(batch.value, fmt) : '—'}</span>
               <span />
             </div>
@@ -216,6 +244,24 @@ export function RecipeEditor({ item, onSelect }: Props) {
           onPick={(id) => addLine(data.items[id])}
           onCreate={(name, kind) => addLine(createItem(kind, name))}
         />
+      </section>
+
+      {/* ---------- Step 2: how many it makes ---------- */}
+      <section className="card">
+        <h2>{t('yield.title')}</h2>
+        <p className="hint">{t('yield.hint')}</p>
+        <div className="yield">
+          <span>{t('batchMakes')}</span>
+          <span className="qty-unit">
+            <NumberField
+              value={item.yieldQty}
+              onChange={(yieldQty) => set({ yieldQty })}
+              aria-label={t('yield.title')}
+              className="short"
+            />
+            <UnitSelect value={item.yieldUnit} onChange={(yieldUnit) => set({ yieldUnit })} aria-label={t('yield.title')} />
+          </span>
+        </div>
       </section>
 
       {/* ---------- Pricing helper ---------- */}
@@ -271,7 +317,7 @@ export function RecipeEditor({ item, onSelect }: Props) {
       {/* ---------- Full breakdown ---------- */}
       {hasNested && cost !== null && (
         <section className="card">
-          <h2>{t('breakdown.title', { unit: yieldLabel })}</h2>
+          <h2>{t('breakdown.title', { unit: yieldOne })}</h2>
           <p className="hint">{t('breakdown.hint')}</p>
           <Breakdown nodes={nodes} total={cost} fmt={fmt} />
         </section>

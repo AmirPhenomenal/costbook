@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { DataPanel } from './components/DataPanel';
 import { IngredientEditor } from './components/IngredientEditor';
 import { RecipeEditor } from './components/RecipeEditor';
@@ -12,12 +12,30 @@ export function App() {
   const [panelOpen, setPanelOpen] = useState(false);
   const item = selectedId ? data.items[selectedId] : undefined;
 
+  // Remember the item we came from, so "Back to Pizza" can be offered after
+  // jumping from a product into one of its materials.
+  const [prevId, setPrevId] = useState<string | null>(null);
+  const lastId = useRef(selectedId);
+  useEffect(() => {
+    if (lastId.current !== selectedId) setPrevId(lastId.current);
+    lastId.current = selectedId;
+  }, [selectedId]);
+  const prev = prevId ? data.items[prevId] : undefined;
+  const returnTo = prev?.kind === 'recipe' && item && prev.components.some((c) => c.itemId === item.id) ? prev : null;
+
+  // Each screen starts at the top.
+  const mainRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    mainRef.current?.scrollTo({ top: 0 });
+    window.scrollTo({ top: 0 });
+  }, [selectedId]);
+
   return (
     <div className={`app ${item ? 'has-selection' : ''}`}>
       <Sidebar selectedId={selectedId} onSelect={select} onOpenData={() => setPanelOpen(true)} />
-      <main className="main">
-        {item?.kind === 'recipe' && <RecipeEditor key={item.id} item={item} onSelect={select} />}
-        {item?.kind === 'ingredient' && <IngredientEditor key={item.id} item={item} onSelect={select} />}
+      <main className="main" ref={mainRef}>
+        {item?.kind === 'recipe' && <RecipeEditor key={item.id} item={item} onSelect={select} returnTo={returnTo} />}
+        {item?.kind === 'ingredient' && <IngredientEditor key={item.id} item={item} onSelect={select} returnTo={returnTo} />}
         {!item && <Welcome onSelect={select} />}
       </main>
       <DataPanel open={panelOpen} onClose={() => setPanelOpen(false)} />

@@ -2,7 +2,7 @@ import { lineCost, usedIn } from '../cost';
 import { money, qty } from '../format';
 import { useI18n } from '../i18n';
 import { useApp } from '../state';
-import type { Ingredient } from '../types';
+import type { Ingredient, Item } from '../types';
 import { getUnit, unitsInFamily } from '../units';
 import { EditorHeader, Notes } from './EditorHeader';
 import { MoneyField } from './MoneyField';
@@ -16,11 +16,12 @@ const FA_EXTRA = ['g', 'sir', 'ml', 'cm', 'min', 'dozen', 'cm2'];
 interface Props {
   item: Ingredient;
   onSelect: (id: string | null) => void;
+  returnTo?: Item | null;
 }
 
-export function IngredientEditor({ item, onSelect }: Props) {
+export function IngredientEditor({ item, onSelect, returnTo }: Props) {
   const { data, dispatch, fmt, unitCost, displayUnit } = useApp();
-  const { t, unit, error, locale, lang } = useI18n();
+  const { t, unit, unitOne, error, locale, lang } = useI18n();
   const set = (patch: Partial<Ingredient>) => dispatch({ type: 'upsert', item: { ...item, ...patch } });
 
   const family = getUnit(item.packUnit)?.family ?? 'mass';
@@ -34,10 +35,11 @@ export function IngredientEditor({ item, onSelect }: Props) {
 
   return (
     <div className="editor">
-      <EditorHeader item={item} onChange={(i) => set(i as Ingredient)} onSelect={onSelect} />
+      <EditorHeader item={item} onChange={(i) => set(i as Ingredient)} onSelect={onSelect} returnTo={returnTo} />
 
       <section className="card">
         <h2>{t('whatYouPay')}</h2>
+        <p className="hint">{t('material.intro')}</p>
         <div className="buy-grid">
           <label className="field">
             <span className="field-label">{t('price.label')}</span>
@@ -55,10 +57,10 @@ export function IngredientEditor({ item, onSelect }: Props) {
         <div className="result">
           {cost.ok ? (
             <>
-              <div className="big">{t('pricePer', { price: money(cost.value, fmt), unit: unit(display) })}</div>
+              <div className="big">{t('pricePer', { price: money(cost.value, fmt), unit: unitOne(display) })}</div>
               {otherUnits.length > 0 && (
                 <div className="muted small">
-                  {otherUnits.map((u) => t('pricePer', { price: money(perBase * u.toBase, fmt), unit: unit(u.id) })).join(' · ')}
+                  {otherUnits.map((u) => t('pricePer', { price: money(perBase * u.toBase, fmt), unit: unitOne(u.id) })).join(' · ')}
                 </div>
               )}
             </>

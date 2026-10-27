@@ -422,9 +422,61 @@ textarea:focus-visible {
   grid-template-columns: 1fr 1fr;
   gap: 8px;
 }
-.new-buttons .btn {
-  font-size: 0.9em;
-  padding: 10px 8px;
+.new-btn {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  cursor: pointer;
+  text-align: start;
+  min-width: 0;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+.new-btn:hover {
+  border-color: var(--muted);
+}
+.new-btn.product {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+.new-btn.product:hover {
+  filter: brightness(1.07);
+}
+.new-plus {
+  flex: none;
+  inline-size: 26px;
+  block-size: 26px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-size: 1.25em;
+  font-weight: 700;
+  line-height: 1;
+  background: var(--ingr-soft);
+  color: var(--ingr);
+}
+.new-btn.product .new-plus {
+  background: rgb(255 255 255 / 18%);
+  color: inherit;
+}
+.new-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.25;
+}
+.new-text b {
+  font-size: 0.92em;
+}
+.new-text span {
+  font-size: 0.76em;
+  opacity: 0.8;
 }
 
 .sidebar-search {
@@ -1273,19 +1325,150 @@ textarea:focus-visible {
 .install-cta {
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  gap: 8px;
   border: 1px dashed var(--accent);
   background: var(--accent-soft);
   color: var(--accent);
   border-radius: 12px;
-  padding: 9px 12px;
+  padding: 8px 12px;
   cursor: pointer;
   font-weight: 700;
-  font-size: 0.9em;
-  text-align: start;
+  font-size: 0.86em;
 }
 .install-cta:hover {
   border-style: solid;
+}
+
+/* sidebar sections */
+.list-tools {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.kind-section + .kind-section {
+  margin-top: 10px;
+  padding-top: 6px;
+  border-top: 1px solid var(--line);
+}
+.kind-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95em;
+  font-weight: 700;
+  margin: 10px 8px 2px;
+}
+.kind-title .count {
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 0.88em;
+  font-variant-numeric: tabular-nums;
+}
+.sidebar-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* editor: way back to the product */
+.btn.return {
+  max-inline-size: min(60vw, 340px);
+  color: var(--accent);
+  font-weight: 600;
+  display: inline-flex;
+  flex-direction: row;
+}
+.btn.return:hover {
+  color: var(--accent);
+}
+
+/* new product: where to start */
+.guide {
+  border: 1.5px dashed var(--accent);
+  background: var(--accent-soft);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+}
+.guide h2 {
+  font-size: 1.05em;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+.guide ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+}
+.guide li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-weight: 600;
+}
+.guide .step-num {
+  inline-size: 26px;
+  block-size: 26px;
+  font-size: 0.95em;
+  background: var(--surface);
+}
+
+.yield .qty-unit {
+  flex-wrap: nowrap;
+}
+
+/* welcome */
+.btn.start {
+  inline-size: 100%;
+  max-inline-size: 360px;
+}
+.examples-title {
+  font-size: 0.95em;
+  color: var(--muted);
+  font-weight: 600;
+  margin: 30px 0 10px;
+}
+.examples {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 10px;
+}
+.example {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: start;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.example:hover {
+  border-color: var(--accent);
+}
+.example-icon {
+  font-size: 1.6em;
+  line-height: 1;
+  flex: none;
+}
+.example-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.35;
+  min-width: 0;
+}
+.brand-mini {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.brand-mini img {
+  border-radius: 7px;
 }
 .install-box .btn {
   margin-top: 6px;
@@ -1438,5 +1621,119 @@ textarea:focus-visible {
   }
   .tree details > .tree {
     display: block;
+  }
+}
+
+/* ---------- phones: easier to tap, nothing hidden off-screen ---------- */
+@media (max-width: 860px) {
+  /* The list page scrolls as one page; the settings button stays at the bottom. */
+  .sidebar {
+    overflow-y: auto;
+    padding-bottom: 0;
+  }
+  .item-list {
+    flex: 1 0 auto;
+    overflow: visible;
+  }
+  .sidebar-foot {
+    position: sticky;
+    bottom: 0;
+    background: var(--surface-2);
+    padding: 8px 0 max(12px, env(safe-area-inset-bottom));
+    margin-top: auto;
+    flex-direction: row;
+  }
+  .sidebar-foot .privacy {
+    flex: 1;
+    min-width: 0;
+  }
+  .sidebar-foot .install-cta span {
+    display: none;
+  }
+  .item-row {
+    padding-block: 11px;
+  }
+  /* The editor's top bar stays visible, so "back" is always one tap away. */
+  .editor-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--bg);
+    margin-inline: -16px;
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  .editor-toolbar.has-return .back {
+    display: none;
+  }
+  .editor {
+    padding-top: 0;
+  }
+  .main {
+    overflow-x: hidden;
+  }
+}
+
+@media (max-width: 620px) {
+  /* 16px text stops iPhone from zooming in when a field is tapped. */
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+  .hide-phone {
+    display: none !important;
+  }
+  .btn,
+  .chip,
+  .segmented button {
+    min-block-size: 40px;
+  }
+  .editor-toolbar .btn.ghost {
+    min-block-size: 38px;
+  }
+  .card,
+  .hero-side,
+  .hero-cost {
+    padding: 14px 15px;
+  }
+  .guide {
+    padding: 14px 15px;
+  }
+  .guide ol {
+    flex-direction: column;
+  }
+  .line > .icon-btn {
+    inline-size: 40px;
+    block-size: 40px;
+    justify-self: end;
+    margin-inline-end: -8px;
+  }
+  .line-amount .num {
+    inline-size: 5.5em;
+  }
+  .suggestions {
+    grid-template-columns: 1fr 1fr;
+  }
+  .new-btn {
+    padding: 11px 10px;
+  }
+  .examples {
+    grid-template-columns: 1fr;
+  }
+  .btn.start {
+    max-inline-size: none;
+  }
+  .welcome h1 {
+    font-size: 1.8em;
+  }
+  .title-input {
+    font-size: 1.45em !important;
+  }
+  .quick {
+    row-gap: 4px;
+  }
+  .modal.panel section {
+    padding: 14px 16px;
   }
 }

@@ -1,15 +1,21 @@
 import { useI18n } from '../i18n';
-import { sampleItems } from '../sample';
+import { sampleItems, type ExampleSet } from '../sample';
 import { useApp } from '../state';
 
 interface Props {
   onSelect: (id: string) => void;
 }
 
-/** First screen: explains the idea in three steps and offers an example. */
+const EXAMPLES: { set: ExampleSet; icon: string }[] = [
+  { set: 'food', icon: '🍕' },
+  { set: 'craft', icon: '🕯️' },
+  { set: 'tech', icon: '🔌' },
+];
+
+/** First screen: explains the idea in three steps, then lets people start or open an example. */
 export function Welcome({ onSelect }: Props) {
   const { data, dispatch, createItem } = useApp();
-  const { t, lang, setLang } = useI18n();
+  const { t, lang, setLang, locale } = useI18n();
   const empty = Object.keys(data.items).length === 0;
 
   if (!empty) {
@@ -20,17 +26,20 @@ export function Welcome({ onSelect }: Props) {
     );
   }
 
-  const loadExample = () => {
-    const items = sampleItems(lang);
+  const loadExample = (set: ExampleSet) => {
+    const items = sampleItems(lang, [set]);
     dispatch({ type: 'addMany', items });
-    const pizza = Object.values(items).find((i) => i.kind === 'recipe' && i.sellPrice !== null);
-    if (pizza) onSelect(pizza.id);
+    const product = Object.values(items).find((i) => i.kind === 'recipe' && i.sellPrice !== null);
+    if (product) onSelect(product.id);
   };
 
   return (
     <div className="welcome">
       <div className="welcome-top mobile-only">
-        <span className="brand-name">Costbook</span>
+        <span className="brand-mini">
+          <img src="./favicon.svg" alt="" width={28} height={28} />
+          <span className="brand-name">Costbook</span>
+        </span>
         <button className="btn ghost lang" onClick={() => setLang(lang === 'fa' ? 'en' : 'fa')} lang={lang === 'fa' ? 'en' : 'fa'}>
           {t('langSwitch')}
         </button>
@@ -39,9 +48,9 @@ export function Welcome({ onSelect }: Props) {
       <p className="lead">{t('welcome.lead')}</p>
 
       <ol className="steps">
-        {(['1', '2', '3'] as const).map((n) => (
+        {([1, 2, 3] as const).map((n) => (
           <li key={n}>
-            <span className="step-num">{Number(n).toLocaleString(lang === 'fa' ? 'fa-IR' : 'en-US')}</span>
+            <span className="step-num">{n.toLocaleString(locale)}</span>
             <div>
               <b>{t(`step${n}.t`)}</b>
               <p className="muted">{t(`step${n}.d`)}</p>
@@ -50,14 +59,23 @@ export function Welcome({ onSelect }: Props) {
         ))}
       </ol>
 
-      <div className="welcome-actions">
-        <button className="btn primary big" onClick={loadExample}>
-          {t('welcome.example')}
-          <span className="small block">{t('welcome.exampleSub')}</span>
-        </button>
-        <button className="btn big" onClick={() => onSelect(createItem('ingredient').id)}>
-          {t('welcome.start')}
-        </button>
+      <button className="btn primary big start" onClick={() => onSelect(createItem('recipe').id)}>
+        {t('welcome.start')}
+      </button>
+
+      <h2 className="examples-title">{t('welcome.examples')}</h2>
+      <div className="examples">
+        {EXAMPLES.map(({ set, icon }) => (
+          <button key={set} className="example" onClick={() => loadExample(set)}>
+            <span className="example-icon" aria-hidden>
+              {icon}
+            </span>
+            <span className="example-text">
+              <b>{t(`ex.${set}`)}</b>
+              <span className="muted small">{t(`ex.${set}.sub`)}</span>
+            </span>
+          </button>
+        ))}
       </div>
 
       <p className="private-note">
