@@ -21,13 +21,44 @@ export function percent(v: number, locale: string): string {
   return locale.startsWith('fa') ? `${n}٪` : `${n}%`;
 }
 
-/** Number shown inside an input box: grouped, in the user's digits. */
-export function inputNumber(v: number, locale: string): string {
-  return Number(v.toPrecision(12)).toLocaleString(locale, { maximumFractionDigits: 6 });
-}
-
 const FA_DIGITS = '۰۱۲۳۴۵۶۷۸۹';
 const AR_DIGITS = '٠١٢٣٤٥٦٧٨٩';
+const SEPARATORS = new Set([',', '٬', '،', ' ', ' ', '‌']);
+
+/** Number shown inside an input box: thousands split with "," (1,800,000), in the user's digits. */
+export function inputNumber(v: number, locale: string): string {
+  const plain = Number(v.toPrecision(12)).toLocaleString('en-US', { maximumFractionDigits: 6, useGrouping: false });
+  return groupTyped(plain, locale) ?? plain;
+}
+
+/**
+ * Re-groups what someone is typing: "1800000.5" → "1,800,000.5".
+ * Keeps everything they typed (trailing ".", zeros after the point), only moves the commas.
+ * Returns null if the text is not a number, so the box can leave it alone and show it as invalid.
+ */
+export function groupTyped(text: string, locale: string): string | null {
+  let ascii = '';
+  for (const ch of text.trim()) {
+    const fi = FA_DIGITS.indexOf(ch);
+    const ai = AR_DIGITS.indexOf(ch);
+    if (fi >= 0) ascii += String(fi);
+    else if (ai >= 0) ascii += String(ai);
+    else if (ch === '.' || ch === '٫' || ch === '/') ascii += '.';
+    else if (SEPARATORS.has(ch)) continue;
+    else ascii += ch;
+  }
+  if (!/^\d*\.?\d*$/.test(ascii)) return null;
+  const [int, frac] = ascii.split('.');
+  const fa = locale.startsWith('fa');
+  let out = int.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  if (frac !== undefined) out += (fa ? '٫' : '.') + frac;
+  return fa ? out.replace(/\d/g, (d) => FA_DIGITS[Number(d)]) : out;
+}
+
+/** Digits and the decimal mark: the characters that matter for keeping the cursor in place. */
+export function isSignificant(ch: string): boolean {
+  return /[\d.٫/]/.test(ch) || FA_DIGITS.includes(ch) || AR_DIGITS.includes(ch);
+}
 
 /**
  * Read a number typed by a person. Accepts Persian/Arabic digits, thousands
